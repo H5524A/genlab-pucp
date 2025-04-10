@@ -123,57 +123,67 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, caseStudyId }) => {
           
           <div className="space-y-3">
             {performanceDetails.map((detail) => (
-              <div 
-                key={detail.experienceId} 
-                className="grid grid-cols-12 gap-2 items-center text-sm"
-              >
-                <div className="col-span-5">
-                  <p className="font-medium truncate">{detail.experienceTitle}</p>
-                </div>
-                
-                <div className="col-span-2 text-center">
-                  {detail.grade ? (
-                    <span className={`font-medium ${
-                      detail.grade >= 4 
-                        ? 'text-edu-secondary' 
-                        : detail.grade >= 3 
-                          ? 'text-edu-warning' 
-                          : 'text-edu-error'
-                    }`}>
-                      {detail.grade.toFixed(1)}
+              <div key={detail.experienceId} className="bg-white rounded-md p-3 border border-gray-100">
+                <div className="grid grid-cols-12 gap-2 items-center text-sm mb-2">
+                  <div className="col-span-5">
+                    <p className="font-medium truncate">{detail.experienceTitle}</p>
+                  </div>
+                  
+                  <div className="col-span-2 text-center">
+                    {detail.grade ? (
+                      <span className={`font-medium ${
+                        detail.grade >= 4 
+                          ? 'text-edu-secondary' 
+                          : detail.grade >= 3 
+                            ? 'text-edu-warning' 
+                            : 'text-edu-error'
+                      }`}>
+                        {detail.grade.toFixed(1)}
+                      </span>
+                    ) : (
+                      <span className="text-edu-muted">Pendiente</span>
+                    )}
+                  </div>
+                  
+                  <div className="col-span-3 text-center">
+                    <span className="text-xs text-edu-muted">
+                      {detail.timeDedicated} min • {detail.attempts} {detail.attempts === 1 ? 'intento' : 'intentos'}
                     </span>
-                  ) : (
-                    <span className="text-edu-muted">Pendiente</span>
-                  )}
+                  </div>
+                  
+                  <div className="col-span-2 text-right">
+                    <div className="w-full bg-gray-200 rounded-full h-1.5">
+                      <div 
+                        className={`h-1.5 rounded-full ${
+                          detail.grade 
+                            ? detail.grade >= 4 
+                              ? 'bg-edu-secondary' 
+                              : detail.grade >= 3 
+                                ? 'bg-edu-warning' 
+                                : 'bg-edu-error'
+                            : 'bg-edu-muted'
+                        }`} 
+                        style={{ width: detail.grade ? `${(detail.grade / 5) * 100}%` : '10%' }}
+                      ></div>
+                    </div>
+                  </div>
                 </div>
                 
-                <div className="col-span-3 text-center">
-                  <span className="text-xs text-edu-muted">
-                    {detail.timeDedicated} min • {detail.attempts} {detail.attempts === 1 ? 'intento' : 'intentos'}
-                  </span>
-                </div>
-                
-                <div className="col-span-2 text-right">
-                  <div className="w-full bg-gray-200 rounded-full h-1.5">
-                    <div 
-                      className={`h-1.5 rounded-full ${
-                        detail.grade 
-                          ? detail.grade >= 4 
-                            ? 'bg-edu-secondary' 
-                            : detail.grade >= 3 
-                              ? 'bg-edu-warning' 
-                              : 'bg-edu-error'
-                          : 'bg-edu-muted'
-                      }`} 
-                      style={{ width: detail.grade ? `${(detail.grade / 5) * 100}%` : '10%' }}
-                    ></div>
+                {/* Comentario para cada experiencia */}
+                <div className="mt-2 pl-2 border-l-2 border-gray-200">
+                  <div className="flex items-start space-x-2">
+                    <MessageSquare className="h-3.5 w-3.5 text-edu-primary mt-0.5" />
+                    <div>
+                      <p className="text-xs text-edu-muted">Comentario:</p>
+                      <p className="text-sm">{detail.comment || "Sin comentario para esta experiencia"}</p>
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
           
-          {/* Progress bar y comentario */}
+          {/* Progress bar */}
           <div className="mt-4 space-y-2">
             <div>
               <div className="flex justify-between text-xs mb-1">
@@ -185,16 +195,6 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, caseStudyId }) => {
                   className="bg-edu-secondary h-2 rounded-full" 
                   style={{ width: `${completion.percentage}%` }}
                 ></div>
-              </div>
-            </div>
-            
-            <div className="pt-3 border-t border-gray-200 mt-3">
-              <div className="flex items-start space-x-2">
-                <MessageSquare className="h-4 w-4 text-edu-primary mt-0.5" />
-                <div>
-                  <p className="text-xs text-edu-muted">Último comentario:</p>
-                  <p className="text-sm">{lastComment}</p>
-                </div>
               </div>
             </div>
           </div>

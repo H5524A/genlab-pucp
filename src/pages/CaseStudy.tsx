@@ -6,6 +6,7 @@ import { caseStudies, experiences, students, enrollments, getStudentCompletionPe
 import ExperienceCard from '@/components/ExperienceCard';
 import StudentCard from '@/components/StudentCard';
 import CreateExperienceModal from '@/components/CreateExperienceModal';
+import CreateCaseStudyModal from '@/components/CreateCaseStudyModal';
 import { toast } from 'sonner';
 
 type TabType = 'experiences' | 'students';
@@ -15,7 +16,9 @@ const CaseStudy = () => {
   const navigate = useNavigate();
   
   const [activeTab, setActiveTab] = useState<TabType>('experiences');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
+  const [isCaseStudyModalOpen, setIsCaseStudyModalOpen] = useState(false);
+  const [editingExperienceId, setEditingExperienceId] = useState<number | null>(null);
   
   // Find the current case study
   const caseStudyId = Number(id);
@@ -55,17 +58,42 @@ const CaseStudy = () => {
     .filter(Boolean) as typeof students;
   
   const handleEditExperience = (experienceId: number) => {
-    toast.info(`Editar experiencia ${experienceId} (función en desarrollo)`);
+    const experienceToEdit = experiences.find(exp => exp.id === experienceId);
+    if (experienceToEdit) {
+      setEditingExperienceId(experienceId);
+      setIsExperienceModalOpen(true);
+    } else {
+      toast.error(`No se encontró la experiencia ${experienceId}`);
+    }
   };
   
   const handleDeleteExperience = (experienceId: number) => {
     toast.success(`Experiencia ${experienceId} eliminada`);
   };
   
-  const handleCreateExperience = (experienceData: any) => {
-    console.log('New experience data:', experienceData);
-    // In a real app, this would add the experience to the database
-    toast.success("Nueva experiencia creada exitosamente");
+  const handleCreateOrUpdateExperience = (experienceData: any) => {
+    if (editingExperienceId) {
+      toast.success(`Experiencia ${editingExperienceId} actualizada exitosamente`);
+      setEditingExperienceId(null);
+    } else {
+      toast.success("Nueva experiencia creada exitosamente");
+    }
+    setIsExperienceModalOpen(false);
+  };
+  
+  const handleCreateCaseStudy = (caseStudyData: any) => {
+    toast.success("Nuevo caso de estudio creado exitosamente");
+    setIsCaseStudyModalOpen(false);
+  };
+  
+  const getExperienceToEdit = () => {
+    if (!editingExperienceId) return null;
+    return experiences.find(exp => exp.id === editingExperienceId) || null;
+  };
+
+  const handleExperienceModalClose = () => {
+    setEditingExperienceId(null);
+    setIsExperienceModalOpen(false);
   };
 
   return (
@@ -148,13 +176,25 @@ const CaseStudy = () => {
                 Experiencias ({caseExperiences.length})
               </h2>
               
-              <button 
-                onClick={() => setIsModalOpen(true)}
-                className="btn-primary flex items-center space-x-2"
-              >
-                <Plus className="h-4 w-4" />
-                <span>Crear Experiencia</span>
-              </button>
+              <div className="flex space-x-3">
+                <button 
+                  onClick={() => setIsCaseStudyModalOpen(true)}
+                  className="btn-secondary flex items-center space-x-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Crear Caso de Estudio</span>
+                </button>
+                <button 
+                  onClick={() => {
+                    setEditingExperienceId(null);
+                    setIsExperienceModalOpen(true);
+                  }}
+                  className="btn-primary flex items-center space-x-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Crear Experiencia</span>
+                </button>
+              </div>
             </div>
             
             {caseExperiences.length > 0 ? (
@@ -178,7 +218,7 @@ const CaseStudy = () => {
                   Comienza creando tu primera experiencia para este caso de estudio
                 </p>
                 <button 
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={() => setIsExperienceModalOpen(true)}
                   className="btn-primary flex items-center space-x-2 mx-auto"
                 >
                   <Plus className="h-4 w-4" />
@@ -217,13 +257,23 @@ const CaseStudy = () => {
         )}
       </main>
       
-      {/* Create Experience Modal */}
+      {/* Experience Modal (Create or Edit) */}
       <CreateExperienceModal
         caseStudyId={caseStudyId}
         caseStudyTitle={caseStudy.titulo}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleCreateExperience}
+        isOpen={isExperienceModalOpen}
+        onClose={handleExperienceModalClose}
+        onSave={handleCreateOrUpdateExperience}
+        experience={getExperienceToEdit()}
+      />
+      
+      {/* Create Case Study Modal */}
+      <CreateCaseStudyModal
+        cursoId={caseStudy.curso_id}
+        cursoNombre="Curso Actual" // Idealmente esto vendría de los datos del curso
+        isOpen={isCaseStudyModalOpen}
+        onClose={() => setIsCaseStudyModalOpen(false)}
+        onSave={handleCreateCaseStudy}
       />
     </div>
   );
