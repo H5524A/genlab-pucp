@@ -182,7 +182,7 @@ const CaseStudy = () => {
                   className="btn-secondary flex items-center space-x-2"
                 >
                   <Plus className="h-4 w-4" />
-                  <span>Crear Caso de Estudio</span>
+                  <span>Editar Caso de Estudio</span>
                 </button>
                 <button 
                   onClick={() => {
@@ -264,7 +264,6 @@ const CaseStudy = () => {
         isOpen={isExperienceModalOpen}
         onClose={handleExperienceModalClose}
         onSave={handleCreateOrUpdateExperience}
-        experience={getExperienceToEdit()}
       />
       
       {/* Create Case Study Modal */}
@@ -274,6 +273,7 @@ const CaseStudy = () => {
         isOpen={isCaseStudyModalOpen}
         onClose={() => setIsCaseStudyModalOpen(false)}
         onSave={handleCreateCaseStudy}
+        caseStudy={caseStudy}
       />
     </div>
   );

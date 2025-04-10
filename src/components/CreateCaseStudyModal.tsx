@@ -113,8 +113,8 @@ const CreateCaseStudyModal: React.FC<CreateCaseStudyModalProps> = ({
                   <FormLabel>Imagen de Portada</FormLabel>
                   <FormControl>
                     <FileUpload
-                      value={field.value}
                       onChange={field.onChange}
+                      currentValue={field.value}
                       accept="image/*"
                       maxSize={5}
                     />
