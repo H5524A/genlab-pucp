@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, User, BarChart2, MessageSquare } from 'lucide-react';
+import { ChevronDown, ChevronUp, User, BarChart2, MessageSquare, Clock, BookOpen } from 'lucide-react';
 import { Student, getStudentAverageGrade, getStudentCompletionPercentage, getStudentPerformanceForCaseStudy } from '@/data/mockData';
 
 interface StudentCardProps {
@@ -11,7 +11,7 @@ interface StudentCardProps {
 const StudentCard: React.FC<StudentCardProps> = ({ student, caseStudyId }) => {
   const [expanded, setExpanded] = useState(false);
   
-  const averageGrade = getStudentAverageGrade(student.codigo);
+  const averageGrade = getStudentAverageGrade(student.codigo, caseStudyId);
   const completion = getStudentCompletionPercentage(student.codigo, caseStudyId);
   const performanceDetails = getStudentPerformanceForCaseStudy(caseStudyId, student.codigo);
   
@@ -19,6 +19,9 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, caseStudyId }) => {
   const lastComment = performanceDetails
     .filter(p => p.comment)
     .sort((a, b) => b.experienceId - a.experienceId)[0]?.comment || "Sin comentarios";
+  
+  // Calculate total time dedicated
+  const totalTime = performanceDetails.reduce((total, exp) => total + (exp.timeDedicated || 0), 0);
   
   return (
     <div className="edu-card overflow-hidden mb-3 animate-fade-in">
@@ -28,49 +31,82 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, caseStudyId }) => {
       >
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-3">
-            <div className="bg-edu-primary bg-opacity-10 rounded-full p-2">
-              <User className="h-5 w-5 text-edu-primary" />
-            </div>
+            {student.avatar_url ? (
+              <img 
+                src={student.avatar_url} 
+                alt={`${student.nombre} ${student.apellido}`} 
+                className="h-10 w-10 rounded-full object-cover"
+              />
+            ) : (
+              <div className="bg-edu-primary bg-opacity-10 rounded-full p-2">
+                <User className="h-5 w-5 text-edu-primary" />
+              </div>
+            )}
             
             <div>
               <h4 className="font-medium text-edu-dark">
                 {student.nombre} {student.apellido}
               </h4>
-              <p className="text-xs text-edu-muted">Código: {student.codigo}</p>
+              <p className="text-xs text-edu-muted">
+                {student.codigo}
+                {student.email && <span className="ml-1">• {student.email}</span>}
+              </p>
             </div>
           </div>
           
-          <button
-            className="text-edu-muted hover:text-edu-primary transition-colors"
-            aria-label={expanded ? "Colapsar" : "Expandir"}
-          >
-            {expanded ? (
-              <ChevronUp className="h-5 w-5" />
-            ) : (
-              <ChevronDown className="h-5 w-5" />
-            )}
-          </button>
+          <div className="flex items-center space-x-3">
+            <div className={`text-sm font-bold px-2 py-1 rounded-full ${
+              averageGrade >= 4 ? 'bg-green-100 text-green-700' :
+              averageGrade >= 3 ? 'bg-yellow-100 text-yellow-700' :
+              'bg-red-100 text-red-700'
+            }`}>
+              {averageGrade.toFixed(1)}
+            </div>
+            
+            <button
+              className="text-edu-muted hover:text-edu-primary transition-colors"
+              aria-label={expanded ? "Colapsar" : "Expandir"}
+            >
+              {expanded ? (
+                <ChevronUp className="h-5 w-5" />
+              ) : (
+                <ChevronDown className="h-5 w-5" />
+              )}
+            </button>
+          </div>
         </div>
         
-        <div className="grid grid-cols-2 mt-3 gap-4">
+        <div className="grid grid-cols-3 mt-4 gap-4">
           <div className="flex items-center space-x-2">
             <BarChart2 className="h-4 w-4 text-edu-secondary" />
             <div>
-              <p className="text-xs text-edu-muted">Progreso General</p>
+              <p className="text-xs text-edu-muted">Progreso</p>
               <p className="text-sm font-medium">
-                {completion.completed} de {completion.total} completadas 
-                <span className="text-xs text-edu-secondary ml-1">
-                  ({completion.percentage}%)
+                {completion.percentage}%
+                <span className="text-xs text-edu-muted ml-1">
+                  ({completion.completed}/{completion.total})
                 </span>
               </p>
             </div>
           </div>
           
           <div className="flex items-center space-x-2">
-            <MessageSquare className="h-4 w-4 text-edu-primary" />
+            <Clock className="h-4 w-4 text-edu-warning" />
             <div>
-              <p className="text-xs text-edu-muted">Último Comentario</p>
-              <p className="text-sm line-clamp-1">{lastComment}</p>
+              <p className="text-xs text-edu-muted">Tiempo Total</p>
+              <p className="text-sm font-medium">
+                {totalTime} min
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <BookOpen className="h-4 w-4 text-edu-primary" />
+            <div>
+              <p className="text-xs text-edu-muted">Nota Promedio</p>
+              <p className="text-sm font-medium">
+                {averageGrade.toFixed(1)}
+              </p>
             </div>
           </div>
         </div>
@@ -78,7 +114,12 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, caseStudyId }) => {
       
       {expanded && (
         <div className="bg-gray-50 px-4 py-3 border-t border-gray-100 animate-slide-in-right">
-          <h5 className="text-sm font-medium text-edu-dark mb-2">Detalle de Experiencias</h5>
+          <div className="flex justify-between items-center mb-2">
+            <h5 className="text-sm font-medium text-edu-dark">Detalle de Experiencias</h5>
+            <div className="text-xs text-edu-primary">
+              {completion.completed} completadas de {completion.total}
+            </div>
+          </div>
           
           <div className="space-y-3">
             {performanceDetails.map((detail) => (
@@ -106,26 +147,55 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, caseStudyId }) => {
                   )}
                 </div>
                 
-                <div className="col-span-5">
-                  <p className="text-edu-muted text-xs truncate">
-                    {detail.comment || "--"}
-                  </p>
+                <div className="col-span-3 text-center">
+                  <span className="text-xs text-edu-muted">
+                    {detail.timeDedicated} min • {detail.attempts} {detail.attempts === 1 ? 'intento' : 'intentos'}
+                  </span>
+                </div>
+                
+                <div className="col-span-2 text-right">
+                  <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div 
+                      className={`h-1.5 rounded-full ${
+                        detail.grade 
+                          ? detail.grade >= 4 
+                            ? 'bg-edu-secondary' 
+                            : detail.grade >= 3 
+                              ? 'bg-edu-warning' 
+                              : 'bg-edu-error'
+                          : 'bg-edu-muted'
+                      }`} 
+                      style={{ width: detail.grade ? `${(detail.grade / 5) * 100}%` : '10%' }}
+                    ></div>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
           
-          {/* Progress bar */}
-          <div className="mt-4">
-            <div className="flex justify-between text-xs mb-1">
-              <span className="font-medium text-edu-dark">Progreso Total</span>
-              <span className="text-edu-secondary">{completion.percentage}%</span>
+          {/* Progress bar y comentario */}
+          <div className="mt-4 space-y-2">
+            <div>
+              <div className="flex justify-between text-xs mb-1">
+                <span className="font-medium text-edu-dark">Progreso Total</span>
+                <span className="text-edu-secondary">{completion.percentage}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-edu-secondary h-2 rounded-full" 
+                  style={{ width: `${completion.percentage}%` }}
+                ></div>
+              </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="bg-edu-secondary h-2 rounded-full" 
-                style={{ width: `${completion.percentage}%` }}
-              ></div>
+            
+            <div className="pt-3 border-t border-gray-200 mt-3">
+              <div className="flex items-start space-x-2">
+                <MessageSquare className="h-4 w-4 text-edu-primary mt-0.5" />
+                <div>
+                  <p className="text-xs text-edu-muted">Último comentario:</p>
+                  <p className="text-sm">{lastComment}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

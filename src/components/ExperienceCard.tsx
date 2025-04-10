@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { CalendarDays, FileText, Edit, Trash2 } from 'lucide-react';
+import { CalendarDays, FileText, Edit, Trash2, Clock } from 'lucide-react';
 import { Experience } from '@/data/mockData';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { getDocumentsForExperience } from '@/data/mockData';
 
 interface ExperienceCardProps {
   experience: Experience;
@@ -21,6 +22,9 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
     new Date(experience.fecha_creacion),
     { addSuffix: true, locale: es }
   );
+
+  // Get documents for this experience
+  const documents = getDocumentsForExperience(experience.id);
 
   return (
     <div className="edu-card flex animate-fade-in">
@@ -69,9 +73,30 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({
           
           <div className="flex items-center text-xs text-edu-muted">
             <FileText className="h-3 w-3 mr-1" />
-            <span>3 archivos</span>
+            <span>{documents.length} {documents.length === 1 ? 'archivo' : 'archivos'}</span>
           </div>
+
+          {experience.duracion_estimada && (
+            <div className="flex items-center text-xs text-edu-muted">
+              <Clock className="h-3 w-3 mr-1" />
+              <span>{experience.duracion_estimada}</span>
+            </div>
+          )}
         </div>
+
+        {experience.nivel_dificultad && (
+          <div className="mt-2">
+            <span className={`text-xs px-2 py-0.5 rounded-full ${
+              experience.nivel_dificultad === 'Básico' 
+                ? 'bg-green-100 text-green-700' 
+                : experience.nivel_dificultad === 'Intermedio'
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'bg-purple-100 text-purple-700'
+            }`}>
+              {experience.nivel_dificultad}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
