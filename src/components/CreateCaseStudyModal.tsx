@@ -54,6 +54,16 @@ const CreateCaseStudyModal: React.FC<CreateCaseStudyModalProps> = ({
 
   const isEditing = !!caseStudy;
 
+  // This function will handle file selection from the FileUpload component
+  const handleFileSelected = (files: File[]) => {
+    if (files && files.length > 0) {
+      // In a real application, you would upload the file to a server
+      // and get back a URL. For now, we'll use a fake URL.
+      const fakeImageUrl = URL.createObjectURL(files[0]);
+      form.setValue('imagen_url', fakeImageUrl);
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px]">
@@ -113,8 +123,9 @@ const CreateCaseStudyModal: React.FC<CreateCaseStudyModalProps> = ({
                   <FormLabel>Imagen de Portada</FormLabel>
                   <FormControl>
                     <FileUpload
-                      onChange={field.onChange}
-                      currentValue={field.value}
+                      label="Seleccionar imagen"
+                      description="Sube una imagen para la portada del caso de estudio"
+                      onFilesSelected={handleFileSelected}
                       accept="image/*"
                       maxSize={5}
                     />
