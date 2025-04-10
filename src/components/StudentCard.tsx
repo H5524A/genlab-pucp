@@ -23,6 +23,13 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, caseStudyId }) => {
   // Calculate total time dedicated
   const totalTime = performanceDetails.reduce((total, exp) => total + (exp.timeDedicated || 0), 0);
   
+  // Function to determine grade color based on grade out of 20
+  const getGradeColor = (grade: number) => {
+    if (grade >= 16) return 'bg-green-100 text-green-700';
+    if (grade >= 12) return 'bg-yellow-100 text-yellow-700';
+    return 'bg-red-100 text-red-700';
+  };
+  
   return (
     <div className="edu-card overflow-hidden mb-3 animate-fade-in">
       <div 
@@ -55,11 +62,7 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, caseStudyId }) => {
           </div>
           
           <div className="flex items-center space-x-3">
-            <div className={`text-sm font-bold px-2 py-1 rounded-full ${
-              averageGrade >= 4 ? 'bg-green-100 text-green-700' :
-              averageGrade >= 3 ? 'bg-yellow-100 text-yellow-700' :
-              'bg-red-100 text-red-700'
-            }`}>
+            <div className={`text-sm font-bold px-2 py-1 rounded-full ${getGradeColor(averageGrade)}`}>
               {averageGrade.toFixed(1)}
             </div>
             
@@ -132,9 +135,9 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, caseStudyId }) => {
                   <div className="col-span-2 text-center">
                     {detail.grade ? (
                       <span className={`font-medium ${
-                        detail.grade >= 4 
+                        detail.grade >= 16 
                           ? 'text-edu-secondary' 
-                          : detail.grade >= 3 
+                          : detail.grade >= 12 
                             ? 'text-edu-warning' 
                             : 'text-edu-error'
                       }`}>
@@ -156,14 +159,14 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, caseStudyId }) => {
                       <div 
                         className={`h-1.5 rounded-full ${
                           detail.grade 
-                            ? detail.grade >= 4 
+                            ? detail.grade >= 16 
                               ? 'bg-edu-secondary' 
-                              : detail.grade >= 3 
+                              : detail.grade >= 12 
                                 ? 'bg-edu-warning' 
                                 : 'bg-edu-error'
                             : 'bg-edu-muted'
                         }`} 
-                        style={{ width: detail.grade ? `${(detail.grade / 5) * 100}%` : '10%' }}
+                        style={{ width: detail.grade ? `${(detail.grade / 20) * 100}%` : '10%' }}
                       ></div>
                     </div>
                   </div>
