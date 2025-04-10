@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Book, Layers, Users, Plus } from 'lucide-react';
@@ -177,13 +176,6 @@ const CaseStudy = () => {
               </h2>
               
               <div className="flex space-x-3">
-                <button 
-                  onClick={() => setIsCaseStudyModalOpen(true)}
-                  className="btn-secondary flex items-center space-x-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span>Editar Caso de Estudio</span>
-                </button>
                 <button 
                   onClick={() => {
                     setEditingExperienceId(null);
